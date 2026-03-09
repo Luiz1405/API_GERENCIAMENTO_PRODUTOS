@@ -16,8 +16,17 @@ function enviarRespostaDados(res, dados) {
     res.end(JSON.stringify(dados));
 }
 
+function enviarRespostaAtualizado(res, numeroPedido) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+        mensagem: 'Pedido atualizado com sucesso',
+        numeroPedido: numeroPedido
+    }));
+}
+
 module.exports = {
     enviarRespostaErro,
     enviarRespostaSucesso,
-    enviarRespostaDados
+    enviarRespostaDados,
+    enviarRespostaAtualizado
 };

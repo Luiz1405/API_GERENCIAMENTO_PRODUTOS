@@ -1,6 +1,6 @@
-const { criarPedido, buscarPedidoPorNumero, listarTodosPedidos } = require('../services/orderService');
+const { criarPedido, buscarPedidoPorNumero, listarTodosPedidos, atualizarPedido } = require('../services/orderService');
 const { validarContentType, validarBodyVazio, validarJSON, isErroValidacao } = require('../utils/requestValidator');
-const { enviarRespostaErro, enviarRespostaSucesso, enviarRespostaDados } = require('../utils/responseHandler');
+const { enviarRespostaErro, enviarRespostaSucesso, enviarRespostaDados, enviarRespostaAtualizado } = require('../utils/responseHandler');
 
 async function criarPedidoController(req, res) {
     const contentType = req.headers['content-type'];
@@ -10,19 +10,19 @@ async function criarPedidoController(req, res) {
         return;
     }
 
-    let corpo = '';
+    let body = '';
 
     req.on('data', chunk => {
-        corpo += chunk.toString();
+        body += chunk.toString();
     });
 
     req.on('end', async () => {
-        if (!validarBodyVazio(corpo)) {
+        if (!validarBodyVazio(body)) {
             enviarRespostaErro(res, 400, 'Body da requisição não pode estar vazio');
             return;
         }
 
-        const dadosPedido = validarJSON(corpo);
+        const dadosPedido = validarJSON(body);
         if (!dadosPedido) {
             enviarRespostaErro(res, 400, 'JSON inválido no body da requisição');
             return;
@@ -80,4 +80,56 @@ async function listarPedidosController(req, res) {
     }
 }
 
-module.exports = { criarPedidoController, buscarPedidoController, listarPedidosController };
+async function atualizarPedidoController(req, res, numeroPedido) {
+    const contentType = req.headers['content-type'];
+
+    if (!validarContentType(contentType)) {
+        enviarRespostaErro(res, 400, 'Content-Type deve ser application/json');
+        return;
+    }
+
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', async () => {
+        if (!validarBodyVazio(body)) {
+            enviarRespostaErro(res, 400, 'Body da requisição não pode estar vazio');
+            return;
+        }
+
+        const dadosPedido = validarJSON(body);
+        if (!dadosPedido) {
+            enviarRespostaErro(res, 400, 'JSON inválido no body da requisição');
+            return;
+        }
+
+        try {
+            const resultado = await atualizarPedido(numeroPedido, dadosPedido);
+            enviarRespostaAtualizado(res, resultado.numeroPedido);
+        } catch (erro) {
+            console.error('Erro ao atualizar pedido:', erro);
+
+            if (erro.message === 'Pedido não encontrado') {
+                enviarRespostaErro(res, 404, erro.message);
+                return;
+            }
+
+            if (isErroValidacao(erro)) {
+                enviarRespostaErro(res, 400, erro.message);
+                return;
+            }
+
+            enviarRespostaErro(res, 500, 'Erro ao atualizar pedido');
+        }
+    });
+
+    req.on('error', (erro) => {
+        console.error('Erro ao ler body:', erro);
+        enviarRespostaErro(res, 400, 'Erro ao processar requisição');
+    });
+}
+
+module.exports = { criarPedidoController, buscarPedidoController, listarPedidosController, atualizarPedidoController };

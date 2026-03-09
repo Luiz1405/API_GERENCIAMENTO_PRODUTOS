@@ -1,5 +1,5 @@
-const { criarPedidoController, buscarPedidoController, listarPedidosController } = require('../controllers/orderController');
-const { extrairNumeroPedidoDaUrl, isRotaGetPedido, isRotaPostPedido, isRotaListarPedidos } = require('../utils/urlParser');
+const { criarPedidoController, buscarPedidoController, listarPedidosController, atualizarPedidoController } = require('../controllers/orderController');
+const { extrairNumeroPedidoDaUrl, isRotaGetPedido, isRotaPostPedido, isRotaListarPedidos, isRotaPutPedido, isRotaPatchPedido } = require('../utils/urlParser');
 const { enviarRespostaErro } = require('../utils/responseHandler');
 
 function tratarRotaPedido(req, res) {
@@ -22,6 +22,18 @@ function tratarRotaPedido(req, res) {
         }
 
         buscarPedidoController(req, res, numeroPedido);
+        return;
+    }
+
+    if ((req.method === 'PUT' || req.method === 'PATCH') && (isRotaPutPedido(req.url) || isRotaPatchPedido(req.url))) {
+        const numeroPedido = extrairNumeroPedidoDaUrl(req.url);
+
+        if (!numeroPedido) {
+            enviarRespostaErro(res, 400, 'Número do pedido não fornecido na URL');
+            return;
+        }
+
+        atualizarPedidoController(req, res, numeroPedido);
         return;
     }
 

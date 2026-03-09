@@ -158,6 +158,95 @@ class PostgresOrderRepository extends OrderRepositoryInterface {
             cliente.release();
         }
     }
+
+    async atualizarPedido(numeroPedido, dadosPedido) {
+        const cliente = await pool.connect();
+
+        try {
+            await cliente.query('BEGIN');
+
+            const campos = [];
+            const valores = [];
+            let contador = 1;
+
+            if (dadosPedido.valorTotal !== undefined) {
+                campos.push(`value = $${contador}`);
+                valores.push(dadosPedido.valorTotal);
+                contador++;
+            }
+
+            if (dadosPedido.dataCriacao !== undefined) {
+                campos.push(`"creationDate" = $${contador}`);
+                valores.push(dadosPedido.dataCriacao);
+                contador++;
+            }
+
+            if (campos.length === 0) {
+                await cliente.query('ROLLBACK');
+                return { sucesso: true, numeroPedido: numeroPedido };
+            }
+
+            valores.push(numeroPedido);
+
+            const queryAtualizarPedido = `
+                UPDATE "Order"
+                SET ${campos.join(', ')}
+                WHERE "orderId" = $${contador}
+            `;
+
+            const resultado = await cliente.query(queryAtualizarPedido, valores);
+
+            if (resultado.rowCount === 0) {
+                await cliente.query('ROLLBACK');
+                return null;
+            }
+
+            await cliente.query('COMMIT');
+            return {
+                sucesso: true,
+                numeroPedido: numeroPedido
+            };
+
+        } catch (erro) {
+            await cliente.query('ROLLBACK');
+            throw erro;
+        } finally {
+            cliente.release();
+        }
+    }
+
+    async atualizarItems(numeroPedido, items) {
+        const cliente = await pool.connect();
+
+        try {
+            await cliente.query('BEGIN');
+
+            await cliente.query('DELETE FROM "Items" WHERE "orderId" = $1', [numeroPedido]);
+
+            const queryInserirItems = `
+                INSERT INTO "Items" ("orderId", "productId", quantity, price)
+                VALUES ($1, $2, $3, $4)
+            `;
+
+            for (const item of items) {
+                await cliente.query(queryInserirItems, [
+                    numeroPedido,
+                    item.idItem,
+                    item.quantidadeItem,
+                    item.valorItem
+                ]);
+            }
+
+            await cliente.query('COMMIT');
+            return { sucesso: true };
+
+        } catch (erro) {
+            await cliente.query('ROLLBACK');
+            throw erro;
+        } finally {
+            cliente.release();
+        }
+    }
 }
 
 module.exports = PostgresOrderRepository;

@@ -2,13 +2,13 @@ function validarContentType(contentType) {
     return contentType && contentType.includes('application/json');
 }
 
-function validarBodyVazio(corpo) {
-    return corpo && corpo.trim() !== '';
+function validarBodyVazio(body) {
+    return body && body.trim() !== '';
 }
 
-function validarJSON(corpo) {
+function validarJSON(body) {
     try {
-        return JSON.parse(corpo);
+        return JSON.parse(body);
     } catch {
         return null;
     }

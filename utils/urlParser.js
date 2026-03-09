@@ -18,9 +18,19 @@ function isRotaListarPedidos(url) {
     return url === '/order/list';
 }
 
+function isRotaPutPedido(url) {
+    return /^\/order\/.+$/.test(url) && url !== '/order/list';
+}
+
+function isRotaPatchPedido(url) {
+    return /^\/order\/.+$/.test(url) && url !== '/order/list';
+}
+
 module.exports = {
     extrairNumeroPedidoDaUrl,
     isRotaGetPedido,
     isRotaPostPedido,
-    isRotaListarPedidos
+    isRotaListarPedidos,
+    isRotaPutPedido,
+    isRotaPatchPedido
 };

@@ -128,15 +128,61 @@ function validarTodosItems(items) {
 }
 
 function validarDadosPedido(dadosPedido) {
-    validarNumeroPedido(dadosPedido.numeroPedido);
     validarValorTotal(dadosPedido.valorTotal);
     validarDataCriacao(dadosPedido.dataCriacao);
     validarItems(dadosPedido.items);
     validarTodosItems(dadosPedido.items);
 }
 
+function validarValorTotalOpcional(valorTotal) {
+    if (valorTotal === undefined || valorTotal === null) {
+        return;
+    }
+
+    if (!isNumero(valorTotal)) {
+        throw new Error('Campo valorTotal deve ser um número');
+    }
+
+    if (!isNumeroPositivo(valorTotal)) {
+        throw new Error('Campo valorTotal não pode ser negativo');
+    }
+}
+
+function validarDataCriacaoOpcional(dataCriacao) {
+    if (!dataCriacao) {
+        return;
+    }
+
+    if (!isDataValida(dataCriacao)) {
+        throw new Error('Campo dataCriacao deve ser uma data válida ano/mes/dia');
+    }
+}
+
+function validarItemsOpcional(items) {
+    if (items === undefined || items === null) {
+        return;
+    }
+
+    if (!Array.isArray(items)) {
+        throw new Error('Campo items deve ser um array');
+    }
+
+    if (items.length === 0) {
+        throw new Error('Campo items deve conter pelo menos um item');
+    }
+
+    validarTodosItems(items);
+}
+
+function validarDadosPedidoParcial(dadosPedido) {
+    validarValorTotalOpcional(dadosPedido.valorTotal);
+    validarDataCriacaoOpcional(dadosPedido.dataCriacao);
+    validarItemsOpcional(dadosPedido.items);
+}
+
 async function criarPedido(dadosPedido) {
     validarDadosPedido(dadosPedido);
+    validarNumeroPedido(dadosPedido.numeroPedido);
 
     const resultadoPedido = await orderRepository.inserirPedido(dadosPedido);
     await orderRepository.inserirItems(dadosPedido.numeroPedido, dadosPedido.items);
@@ -164,4 +210,39 @@ async function listarTodosPedidos() {
     return pedidos;
 }
 
-module.exports = { criarPedido, buscarPedidoPorNumero, listarTodosPedidos };
+async function atualizarPedido(numeroPedido, dadosPedido) {
+    validarNumeroPedido(numeroPedido);
+
+    const pedidoExiste = await orderRepository.buscarPedidoPorNumero(numeroPedido);
+    if (!pedidoExiste) {
+        throw new Error('Pedido não encontrado');
+    }
+
+    validarDadosPedidoParcial(dadosPedido);
+
+    const temCamposParaAtualizar = dadosPedido.valorTotal !== undefined ||
+        dadosPedido.dataCriacao !== undefined ||
+        dadosPedido.items !== undefined;
+
+    if (!temCamposParaAtualizar) {
+        throw new Error('É necessário enviar pelo menos um campo para atualizar');
+    }
+
+    if (dadosPedido.valorTotal !== undefined || dadosPedido.dataCriacao !== undefined) {
+        const resultadoPedido = await orderRepository.atualizarPedido(numeroPedido, dadosPedido);
+        if (!resultadoPedido) {
+            throw new Error('Erro ao atualizar pedido');
+        }
+    }
+
+    if (dadosPedido.items !== undefined) {
+        await orderRepository.atualizarItems(numeroPedido, dadosPedido.items);
+    }
+
+    return {
+        sucesso: true,
+        numeroPedido: numeroPedido
+    };
+}
+
+module.exports = { criarPedido, buscarPedidoPorNumero, listarTodosPedidos, atualizarPedido };
