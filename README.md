@@ -33,7 +33,7 @@ API RESTful para gerenciamento de pedidos desenvolvida em Node.js e Javascript, 
 
 ### Estrutura de Pastas
 ```
-Desafio_Tecnico_Jitterbit/
+API_Gerenciamento_De_Pedidos/
 ├── config/              # Configurações (Swagger)
 ├── controllers/         # Controladores (HTTP)
 ├── database/            # Configuração e inicialização do banco
@@ -82,7 +82,7 @@ PORT=3000
 DB_TYPE=postgres
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=jitterbit
+DB_NAME=projetopessoal
 DB_USER=postgres
 DB_PASSWORD=postgres
 
@@ -97,7 +97,7 @@ require('crypto').randomBytes(64).toString('hex')
 
 ### 3. Criar banco de dados
 ```bash
-psql -U postgres -c "CREATE DATABASE jitterbit;"
+psql -U postgres -c "CREATE DATABASE projetopessoal;"
 ```
 
 ### 4. Iniciar servidor
