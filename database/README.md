@@ -5,7 +5,7 @@
 ### Opção 1: Via psql (linha de comando)
 
 ```bash
-psql -U postgres -c "CREATE DATABASE jitterbit;"
+psql -U postgres -c "CREATE DATABASE projetopessoal;"
 ```
 
 ### Opção 2: Via arquivo SQL
@@ -20,7 +20,7 @@ psql -U postgres -f create_database.sql
 2. Conecte-se ao servidor PostgreSQL
 3. Clique com botão direito em "Databases"
 4. Selecione "Create" > "Database"
-5. Digite o nome: `jitterbit`
+5. Digite o nome: `projetopessoal`
 6. Clique em "Save"
 
 ## Configurar o arquivo .env

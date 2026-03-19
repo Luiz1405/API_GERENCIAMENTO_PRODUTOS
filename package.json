@@ -1,5 +1,5 @@
 {
-  "name": "desafio_tecnico_jitterbit",
+  "name": "API_Gerenciamento_De_Produtos",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Luiz1405/Desafio_Tecnico_Jitterbit.git"
+    "url": "git+https://github.com/Luiz1405/API_Gerenciamento_Pedidos.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Luiz1405/Desafio_Tecnico_Jitterbit/issues"
+    "url": "https://github.com/Luiz1405/API_Gerenciamento_Pedidos/issues"
   },
-  "homepage": "https://github.com/Luiz1405/Desafio_Tecnico_Jitterbit#readme",
+  "homepage": "https://github.com/Luiz1405/API_Gerenciamento_Pedidos#readme",
   "dependencies": {
     "pg": "^8.11.3",
     "dotenv": "^16.3.1",

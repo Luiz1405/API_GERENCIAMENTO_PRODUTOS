@@ -4,7 +4,7 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'API Desafio Técnico Jitterbit',
+            title: 'API Gerenciamento De Pedidos',
             version: '1.0.0',
             description: 'API de gerenciamento de pedidos com autenticação JWT e Swagger',
         },
